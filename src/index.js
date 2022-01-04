@@ -59,6 +59,23 @@ function todoTemplate(todo){
   `
 }
 
+function displayError(error){
+  const todoInput = document.querySelector(".todo-input")
+  const errorParagraph = document.querySelector("p.error")
+
+  errorParagraph.innerText = error
+  todoInput.classList.add("error")
+  errorParagraph.classList.remove("hide")
+}
+function hideError(){
+  const todoInput = document.querySelector(".todo-input")
+  const errorParagraph = document.querySelector("p.error")
+  
+  todoInput.classList.remove("error")
+  errorParagraph.classList.add("hide")
+}
+
+
 function renderTodo(todo){
   console.log(todos);
   const todoList = document.querySelector(".todo-list")
@@ -97,14 +114,21 @@ function renderTodosLeft(){
 
 function addTodoController(){
   const todoInput = document.querySelector(".todo-input")
+  if(todoInput.value.length < 3){
+    displayError("At least 2 characters")
+    return
+  }
+  hideError()
   const todo = addTodo(todoInput.value)
   renderTodo(todo)
   renderTodosLeft()
+  todoInput.value = ""
 }
 
 function main(){
   loadState()
   todos.forEach(todo => renderTodo(todo))
+  renderTodosLeft()
 
   const addBtn = document.querySelector(".add-todo-btn")
   addBtn.addEventListener("click", addTodoController)

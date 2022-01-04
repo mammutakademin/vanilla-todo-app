@@ -13,3 +13,8 @@ p.todos-left{
   text-align: center;
   padding: 1rem;
 }
+
+p.error{
+  color: $error;
+  text-align: right;
+}
