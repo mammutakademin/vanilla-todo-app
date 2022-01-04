@@ -8,6 +8,17 @@ const todos = []
 //   done: Boolean
 // }
 
+function persist(){
+  localStorage.setItem("todos", JSON.stringify(todos))
+}
+function loadState(){
+  const persistedTodos = localStorage.getItem("todos")
+  if(persistedTodos){
+    todos.push(...JSON.parse(persistedTodos))
+  }
+}
+
+
 function generateID(){
   return String(Date.now()) + String(Math.ceil(Math.random()*Math.pow(10,5)))
 }
@@ -18,8 +29,8 @@ function addTodo(content){
     content: content,
     done: false
   }
-  console.log(todo.id);
   todos.push(todo)
+  persist()
   return todo
 }
 
@@ -51,9 +62,10 @@ function renderTodo(todo){
 
   li.querySelector(".edit").addEventListener("click", () => {})
   li.querySelector(".delete").addEventListener("click", () => {
-    const index = todos.findIndex(t => t.id == todo.id)
+    const index = todos.findIndex(t => t.id === todo.id)
     todos.splice(index, 1)
     li.remove()
+    persist()
   })
 
 
@@ -69,8 +81,9 @@ function addTodoController(){
 }
 
 function main(){
-  renderTodo(addTodo("Köp mjölk"))
-  renderTodo(addTodo("Köp choklad"))
+  loadState()
+  todos.forEach(todo => renderTodo(todo))
+
   const addBtn = document.querySelector(".add-todo-btn")
   addBtn.addEventListener("click", addTodoController)
 }
