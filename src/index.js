@@ -1,6 +1,7 @@
 import './styles/main.scss'
 
 const todos = []
+let filtered = false
 //Todo Model
 // {
 //   id: String,
@@ -11,6 +12,7 @@ const todos = []
 function persist(){
   localStorage.setItem("todos", JSON.stringify(todos))
 }
+
 function loadState(){
   const persistedTodos = localStorage.getItem("todos")
   if(persistedTodos){
@@ -77,10 +79,11 @@ function hideError(){
 
 
 function renderTodo(todo){
-  console.log(todos);
   const todoList = document.querySelector(".todo-list")
   const li = document.createElement("li")
   li.classList.add("todo-item")
+  li.setAttribute("data-id", todo.id)
+
   if(todo.done){
     li.classList.add("done")
   }
@@ -112,6 +115,21 @@ function renderTodosLeft(){
   p.innerText = todosLeft()
 }
 
+function filterTodos(){
+  filtered = !filtered 
+
+  todos.forEach(todo => {
+    if(todo.done){
+      const li = document.querySelector(`[data-id="${todo.id}"]`)
+      if(filtered){
+        li.classList.add("hidden")
+      }else{
+        li.classList.remove("hidden")
+      }
+    }
+  })
+}
+
 function addTodoController(){
   const todoInput = document.querySelector(".todo-input")
   if(todoInput.value.length < 3){
@@ -132,5 +150,8 @@ function main(){
 
   const addBtn = document.querySelector(".add-todo-btn")
   addBtn.addEventListener("click", addTodoController)
+
+  const toggleDoneCheckbox = document.querySelector(".toggle-done")
+  toggleDoneCheckbox.addEventListener("click", filterTodos)
 }
 main()
