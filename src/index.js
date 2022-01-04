@@ -77,6 +77,13 @@ function hideError(){
   errorParagraph.classList.add("hide")
 }
 
+function selectElementContents(el) {
+  var range = document.createRange();
+  range.selectNodeContents(el);
+  var sel = window.getSelection();
+  sel.removeAllRanges();
+  sel.addRange(range);
+}
 
 function renderTodo(todo){
   const todoList = document.querySelector(".todo-list")
@@ -88,16 +95,29 @@ function renderTodo(todo){
     li.classList.add("done")
   }
   li.innerHTML = todoTemplate(todo)
+  
 
   li.addEventListener("click", () => {
     todo.done = !todo.done
-    li.classList.toggle("done")
+    li.classList.toggle("done")    
     renderTodosLeft()
     persist()
   })
 
-  li.querySelector(".edit").addEventListener("click", () => {
+  li.addEventListener("keydown", event => {
+    if(event.code === "Enter"){      
+      const content = li.querySelector(".content")
+      content.removeAttribute("contenteditable", "true")
+      todo.content = content.innerText
+      persist()
+    }
+  })
 
+  li.querySelector(".edit").addEventListener("click", () => {
+    const content = li.querySelector(".content")
+    content.setAttribute("contenteditable", "true")
+    content.focus()
+    selectElementContents(content)
   })
 
   li.querySelector(".delete").addEventListener("click", () => {
@@ -118,15 +138,15 @@ function renderTodosLeft(){
 function filterTodos(){
   filtered = !filtered 
 
-  todos.forEach(todo => {
-    if(todo.done){
+  todos
+  .filter(todo => todo.done)
+  .forEach(todo => {
       const li = document.querySelector(`[data-id="${todo.id}"]`)
       if(filtered){
         li.classList.add("hidden")
       }else{
         li.classList.remove("hidden")
       }
-    }
   })
 }
 
