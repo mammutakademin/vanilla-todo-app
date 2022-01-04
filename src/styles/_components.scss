@@ -86,3 +86,46 @@ button{
     padding: 0;
   }
 }
+
+dialog{
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 2rem;
+  border: 0;
+  box-shadow: 0px 2px 11px -1px rgba(0,0,0,0.77);
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+  opacity: 0;
+  pointer-events: none;
+  background-color: #eee;
+  
+  &[open]{
+    pointer-events: all;
+    opacity: 1;
+  }
+
+  span.input-container{
+    input{
+      margin: 2rem;
+      padding: 1rem;
+      border: 2px solid black;
+    }
+  }
+  button{
+    align-self: flex-end;
+  }
+}
+
+.fade-layer{
+  background-color: black;
+  position: fixed;
+  left: 0; top: 0; right: 0; bottom: 0;
+  opacity: 0;
+  pointer-events: none;
+  
+  &.show{
+    opacity: 0.3;
+    pointer-events: all;
+  }
+}

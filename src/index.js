@@ -61,33 +61,80 @@ function todoTemplate(todo){
   `
 }
 
-function displayError(error){
-  const todoInput = document.querySelector(".todo-input")
-  const errorParagraph = document.querySelector("p.error")
+function displayError(selector, error){
+  const formElement = document.querySelector(selector)
+  const errorParagraph = document.querySelector(`${selector} + p.error`)
 
   errorParagraph.innerText = error
-  todoInput.classList.add("error")
+  formElement.classList.add("error")
   errorParagraph.classList.remove("hide")
 }
-function hideError(){
-  const todoInput = document.querySelector(".todo-input")
-  const errorParagraph = document.querySelector("p.error")
+function hideError(selector){
+  const todoInput = document.querySelector(selector)
+  const errorParagraph = document.querySelector(`${selector} + p.error`)
   
   todoInput.classList.remove("error")
   errorParagraph.classList.add("hide")
 }
 
-function selectElementContents(el) {
-  var range = document.createRange();
-  range.selectNodeContents(el);
-  var sel = window.getSelection();
-  sel.removeAllRanges();
-  sel.addRange(range);
+function showDialog(){
+  const dialog = document.querySelector("dialog")
+  const fadeLayer = document.querySelector(".fade-layer")
+  const dialogInput = dialog.querySelector("input")
+  dialogInput.focus()
+  dialogInput.setSelectionRange(0, dialogInput.value.length)
+
+  dialog.setAttribute("open", "")
+  fadeLayer.classList.add("show")
+}
+
+function hideDialog(){
+  const dialog = document.querySelector("dialog")
+  const fadeLayer = document.querySelector(".fade-layer")
+  
+  hideError("dialog input")
+  dialog.removeAttribute("open")
+  fadeLayer.classList.remove("show")
+}
+
+function toggleTodo(todo, li){
+  todo.done = !todo.done
+  li.classList.toggle("done")    
+  renderTodosLeft()
+  persist()
+}
+
+function updateTodo(todo, li){
+  const updateInput = document.querySelector("dialog input")
+  if(updateInput.value.length < 3){
+    displayError("dialog input", "At least 2 characters")
+    return
+  }
+  todo.content = updateInput.value
+  li.querySelector(".content").innerText = updateInput.value
+  hideDialog()
+  persist()
+} 
+
+function showEditDialog(todo, li){
+  const updateInput = document.querySelector("dialog input")
+  updateInput.value = todo.content  
+  showDialog()
+  const saveButton = document.querySelector("dialog button")
+  saveButton.addEventListener("click", () => updateTodo(todo, li))
+}
+
+function deleteTodo(todo, li){
+  const index = todos.findIndex(t => t.id === todo.id)
+  todos.splice(index, 1)
+  li.remove()
+  persist()
 }
 
 function renderTodo(todo){
   const todoList = document.querySelector(".todo-list")
   const li = document.createElement("li")
+
   li.classList.add("todo-item")
   li.setAttribute("data-id", todo.id)
 
@@ -96,36 +143,14 @@ function renderTodo(todo){
   }
   li.innerHTML = todoTemplate(todo)
   
-
-  li.addEventListener("click", () => {
-    todo.done = !todo.done
-    li.classList.toggle("done")    
-    renderTodosLeft()
-    persist()
-  })
-
-  li.addEventListener("keydown", event => {
-    if(event.code === "Enter"){      
-      const content = li.querySelector(".content")
-      content.removeAttribute("contenteditable", "true")
-      todo.content = content.innerText
-      persist()
-    }
-  })
-
-  li.querySelector(".edit").addEventListener("click", () => {
-    const content = li.querySelector(".content")
-    content.setAttribute("contenteditable", "true")
-    content.focus()
-    selectElementContents(content)
-  })
-
-  li.querySelector(".delete").addEventListener("click", () => {
-    const index = todos.findIndex(t => t.id === todo.id)
-    todos.splice(index, 1)
-    li.remove()
-    persist()
-  })
+  li.addEventListener("click", () => toggleTodo(todo, li))
+  li.querySelector(".edit")
+    .addEventListener("click", (event) => {
+      event.stopPropagation()
+      showEditDialog(todo, li)
+    })
+  li.querySelector(".delete")
+    .addEventListener("click", () => deleteTodo(todo, li))
 
   todoList.append(li)
 }
@@ -153,10 +178,14 @@ function filterTodos(){
 function addTodoController(){
   const todoInput = document.querySelector(".todo-input")
   if(todoInput.value.length < 3){
-    displayError("At least 2 characters")
+
+    displayError(
+      ".todo-input",
+      "At least 2 characters"
+    )
     return
   }
-  hideError()
+  hideError(".todo-input")
   const todo = addTodo(todoInput.value)
   renderTodo(todo)
   renderTodosLeft()
@@ -173,5 +202,8 @@ function main(){
 
   const toggleDoneCheckbox = document.querySelector(".toggle-done")
   toggleDoneCheckbox.addEventListener("click", filterTodos)
+
+  const fadeLayer = document.querySelector(".fade-layer")
+  fadeLayer.addEventListener("click", hideDialog)
 }
 main()
