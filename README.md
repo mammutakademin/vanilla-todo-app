@@ -14,6 +14,20 @@ yarn build
 
 to bundle your application
 
+# Features
+```
+Create To Do items
+Mark an item as done
+Edit an item
+Delete an item
+See how many items are left to do
+Persistence in local storage
+
+# Technology
+```
+Version control
+Develop environment with WebPack and SASS
+MVC
 
 # Terminal History
 ```bash
