@@ -22,6 +22,8 @@ Edit an item
 Delete an item
 See how many items are left to do
 Persistence in local storage
+Error handling
+Hide done todos
 ```
 
 # Technology
